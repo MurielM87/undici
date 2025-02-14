@@ -1,22 +1,7 @@
 // GENERATED CONTENT - DO NOT EDIT
 // Content was automatically extracted by Reffy into webref
 // (https://github.com/w3c/webref)
-// Source: Federated Credential Management API (https://fedidcg.github.io/FedCM/)
-
-enum LoginStatus {
-  "logged-in",
-  "logged-out",
-};
-
-[Exposed=Window, SecureContext]
-
-interface NavigatorLogin {
-  Promise<undefined> setStatus(LoginStatus status);
-};
-
-partial interface Navigator {
-  [SecureContext] readonly attribute NavigatorLogin login;
-};
+// Source: Federated Credential Management API (https://w3c-fedid.github.io/FedCM/)
 
 dictionary IdentityCredentialDisconnectOptions : IdentityProviderConfig {
   required USVString accountHint;
@@ -44,9 +29,15 @@ enum IdentityCredentialRequestOptionsContext {
   "continue"
 };
 
+enum IdentityCredentialRequestOptionsMode {
+  "active",
+  "passive"
+};
+
 dictionary IdentityCredentialRequestOptions {
   required sequence<IdentityProviderRequestOptions> providers;
   IdentityCredentialRequestOptionsContext context = "signin";
+  IdentityCredentialRequestOptionsMode mode = "passive";
 };
 
 dictionary IdentityProviderConfig {
@@ -58,10 +49,14 @@ dictionary IdentityProviderRequestOptions : IdentityProviderConfig {
   USVString nonce;
   DOMString loginHint;
   DOMString domainHint;
+  sequence<USVString> fields;
+  any params;
 };
 
 dictionary IdentityProviderWellKnown {
-  required sequence<USVString> provider_urls;
+  sequence<USVString> provider_urls;
+  USVString accounts_endpoint;
+  USVString login_url;
 };
 
 dictionary IdentityProviderIcon {
@@ -99,8 +94,9 @@ dictionary IdentityProviderAccountList {
   sequence<IdentityProviderAccount> accounts;
 };
 
-dictionary IdentityProviderToken {
-  required USVString token;
+dictionary IdentityAssertionResponse {
+  USVString token;
+  USVString continue_on;
 };
 
 dictionary IdentityProviderClientMetadata {
@@ -115,7 +111,12 @@ dictionary IdentityUserInfo {
   USVString picture;
 };
 
+dictionary IdentityResolveOptions {
+  USVString accountId;
+};
+
 [Exposed=Window, SecureContext] interface IdentityProvider {
     static undefined close();
+    static undefined resolve(DOMString token, optional IdentityResolveOptions options = {});
     static Promise<sequence<IdentityUserInfo>> getUserInfo(IdentityProviderConfig config);
 };
